@@ -60,6 +60,18 @@ class Button():
             self.buttonRect.height / 2 - self.buttonSurf.get_rect().height / 2
         ])
         screen.blit(self.buttonSurface, self.buttonRect)
+#button function
+def myFunction():
+    global score
+    score +=1
+    objects.pop()
+    customButton = Button(random.randint(40, 600), random.randint(40, 440), 100, 50, 'BONK', myFunction)
+    global start_ticks
+    start_ticks = pygame.time.get_ticks()
+    global timing
+    timing *= 0.98
+#button itself
+customButton = Button(30, 250, 100, 50, 'YES', myFunction)
 #time and score
 start_ticks = pygame.time.get_ticks()
 score = 0
@@ -72,3 +84,5 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
+    for object in objects:
+        object.process()
