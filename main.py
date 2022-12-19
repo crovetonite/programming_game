@@ -1,5 +1,6 @@
 import pygame
 import random
+import sys
 pygame.init()
 
 #settings
@@ -86,3 +87,14 @@ while True:
             sys.exit()
     for object in objects:
         object.process()
+
+    seconds = (pygame.time.get_ticks() - start_ticks) / 1000
+    if check == False:
+        time_surf = txt_font.render_to(screen, (50, 350), 'осталось ' + str(timing-seconds)[:3]+' секунд', (250, 250, 250))
+    if seconds > timing:
+        check = True
+    if check:
+        objects.clear()
+        end_surface = txt_font.render_to(screen, (50, 350), 'Время вышло, Вы набрали ' +str(score), (220, 255, 125))
+    pygame.display.flip()
+    fpsClock.tick(fps)
