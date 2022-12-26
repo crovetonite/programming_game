@@ -110,7 +110,6 @@ def myFunction():
 
 
 # time and score
-start_ticks = pygame.time.get_ticks()
 score = 0
 check = False
 timing = 10
@@ -121,6 +120,8 @@ bg = pygame.transform.scale(bg, (640, 480))
 # button itself
 def game():
     customButton = Game_Button(random.choice(x_spawn), random.choice(y_spawn), 50, 70, 'he.png', myFunction)
+    global start_ticks
+    start_ticks = pygame.time.get_ticks()
     global check
     while True:
         screen.fill((30, 30, 30))
