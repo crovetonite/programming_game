@@ -62,54 +62,91 @@ class Button():
         ])
         screen.blit(self.buttonSurface, self.buttonRect)
 
+class Game_Button():
+    def __init__(self, x, y, width, height, image, onclickFunction=None, onePress=False):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.onclickFunction = onclickFunction
+        self.onePress = onePress
+        self.img = pygame.image.load(image)
+        self.img = pygame.transform.scale(self.img, (self.width, self.height))
+        self.buttonSurface = self.img
+        self.buttonRect = self.img.get_rect(topleft=(self.x, self.y))
 
-# game cycle
-def game():
-    # time and score
+        self.alreadyPressed = False
+
+        objects.append(self)
+
+    def process(self):
+
+        mousePos = pygame.mouse.get_pos()
+
+        if self.buttonRect.collidepoint(mousePos):
+            if pygame.mouse.get_pressed(num_buttons=3)[0]:
+
+                if self.onePress:
+                    self.onclickFunction()
+
+                elif not self.alreadyPressed:
+                    self.onclickFunction()
+                    self.alreadyPressed = True
+
+            else:
+                self.alreadyPressed = False
+        screen.blit(self.buttonSurface, (self.x, self.y))
+
+# button function
+def myFunction():
+    global score
+    score += 1
+    objects.pop()
+    customButton = Game_Button(random.choice(x_spawn), random.choice(y_spawn), 50, 70, 'he.png', myFunction)
+    global start_ticks
     start_ticks = pygame.time.get_ticks()
-    global score, check, timing
-    score = 0
-    check = False
-    timing = 10
-    #button function
-    def myFunction():
-        global score
-        score +=1
-        objects.pop()
-        customButton = Button(random.randint(40, 600), random.randint(40, 440), 100, 50, 'BONK', myFunction)
-        global start_ticks
-        start_ticks = pygame.time.get_ticks()
-        global timing
-        timing *= 0.98
-    # button itself
-    customButton = Button(random.randint(40, 600), random.randint(40, 440), 100, 50, 'BONK', myFunction)
+    global timing
+    timing *= 0.98
+
+
+# time and score
+start_ticks = pygame.time.get_ticks()
+score = 0
+check = False
+timing = 10
+x_spawn = [100, 300, 500]
+y_spawn = [70, 280]
+bg = pygame.image.load('grass.jpg')
+bg = pygame.transform.scale(bg, (640, 480))
+# button itself
+def game():
+    customButton = Game_Button(random.choice(x_spawn), random.choice(y_spawn), 50, 70, 'he.png', myFunction)
+    global check
     while True:
         screen.fill((30, 30, 30))
+        screen.blit(bg, (0, 0))
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
         for object in objects:
             object.process()
-
         seconds = (pygame.time.get_ticks() - start_ticks) / 1000
         if check == False:
-            time_surf = txt_font.render_to(screen, (50, 350), 'осталось ' + str(timing - seconds)[:3] + ' секунд',
+            time_surf = txt_font.render_to(screen, (50, 400), 'осталось ' + str(timing - seconds)[:3] + ' секунд',
                                            (250, 250, 250))
         if seconds > timing:
             check = True
         if check:
             objects.clear()
             end_surface = txt_font.render_to(screen, (50, 350), 'Время вышло, Вы набрали ' + str(score),
-                                             (220, 255, 125))
+                                             (220, 125, 220))
         pygame.display.flip()
         fpsClock.tick(fps)
-def starting():
+def start():
     objects.clear()
     game()
-
-
-start = Button(320,240,200,100,'START GAME', starting)
+begin = Button(220, 190, 200, 100, 'START', start)
 while True:
     screen.fill((30, 30, 30))
     for event in pygame.event.get():
