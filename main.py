@@ -61,24 +61,55 @@ class Button():
             self.buttonRect.height / 2 - self.buttonSurf.get_rect().height / 2
         ])
         screen.blit(self.buttonSurface, self.buttonRect)
-#button function
-def myFunction():
-    global score
-    score +=1
-    objects.pop()
-    customButton = Button(random.randint(40, 600), random.randint(40, 440), 100, 50, 'BONK', myFunction)
-    global start_ticks
+
+
+# game cycle
+def game():
+    # time and score
     start_ticks = pygame.time.get_ticks()
-    global timing
-    timing *= 0.98
-#button itself
-customButton = Button(30, 250, 100, 50, 'YES', myFunction)
-#time and score
-start_ticks = pygame.time.get_ticks()
-score = 0
-check = False
-timing = 10
-#game cycle
+    global score, check, timing
+    score = 0
+    check = False
+    timing = 10
+    #button function
+    def myFunction():
+        global score
+        score +=1
+        objects.pop()
+        customButton = Button(random.randint(40, 600), random.randint(40, 440), 100, 50, 'BONK', myFunction)
+        global start_ticks
+        start_ticks = pygame.time.get_ticks()
+        global timing
+        timing *= 0.98
+    # button itself
+    customButton = Button(random.randint(40, 600), random.randint(40, 440), 100, 50, 'BONK', myFunction)
+    while True:
+        screen.fill((30, 30, 30))
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+        for object in objects:
+            object.process()
+
+        seconds = (pygame.time.get_ticks() - start_ticks) / 1000
+        if check == False:
+            time_surf = txt_font.render_to(screen, (50, 350), 'осталось ' + str(timing - seconds)[:3] + ' секунд',
+                                           (250, 250, 250))
+        if seconds > timing:
+            check = True
+        if check:
+            objects.clear()
+            end_surface = txt_font.render_to(screen, (50, 350), 'Время вышло, Вы набрали ' + str(score),
+                                             (220, 255, 125))
+        pygame.display.flip()
+        fpsClock.tick(fps)
+def starting():
+    objects.clear()
+    game()
+
+
+start = Button(320,240,200,100,'START GAME', starting)
 while True:
     screen.fill((30, 30, 30))
     for event in pygame.event.get():
@@ -87,14 +118,5 @@ while True:
             sys.exit()
     for object in objects:
         object.process()
-
-    seconds = (pygame.time.get_ticks() - start_ticks) / 1000
-    if check == False:
-        time_surf = txt_font.render_to(screen, (50, 350), 'осталось ' + str(timing-seconds)[:3]+' секунд', (250, 250, 250))
-    if seconds > timing:
-        check = True
-    if check:
-        objects.clear()
-        end_surface = txt_font.render_to(screen, (50, 350), 'Время вышло, Вы набрали ' +str(score), (220, 255, 125))
     pygame.display.flip()
     fpsClock.tick(fps)
